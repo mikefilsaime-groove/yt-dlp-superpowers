@@ -1,0 +1,2 @@
+Watch Video: use the watch-video skill on this URL at 1 frame per second and summarize what is visible on screen compared with what is said in the transcript.
+

@@ -1,0 +1,6 @@
+Install the Claude/Codex skills from this repo.
+
+Run ./install.sh, verify yt-dlp, ffmpeg, and WhisperX are available, then test the skill help commands.
+
+Do not download any videos unless I provide a URL.
+

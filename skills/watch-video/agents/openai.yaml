@@ -1,0 +1,3 @@
+display_name: Watch Video
+short_description: Extract transcript plus timed video screenshots so Codex can inspect what was visible.
+default_prompt: Watch Video: analyze this video with transcript plus timed screenshots.

@@ -1,0 +1,3 @@
+display_name: yt-dlp
+short_description: Download, inspect, and extract media with the local yt-dlp CLI.
+default_prompt: Use yt-dlp to inspect or download this media URL, saving the result to an appropriate output folder.
