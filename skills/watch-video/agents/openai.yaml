@@ -1,3 +1,4 @@
-display_name: Watch Video
-short_description: Extract transcript plus timed video screenshots so Codex can inspect what was visible.
-default_prompt: Watch Video: analyze this video with transcript plus timed screenshots.
+interface:
+  display_name: "Watch Video"
+  short_description: "Pair transcripts with timed video screenshots."
+  default_prompt: "Use $watch-video to analyze this video with transcript plus timed screenshots."

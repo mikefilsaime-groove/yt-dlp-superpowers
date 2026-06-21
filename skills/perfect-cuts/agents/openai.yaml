@@ -1,0 +1,4 @@
+interface:
+  display_name: "Perfect Cuts"
+  short_description: "Remove retakes and false starts from talking-head clips."
+  default_prompt: "Use $perfect-cuts to turn this raw talking-head clip into a frame-perfect edited package."

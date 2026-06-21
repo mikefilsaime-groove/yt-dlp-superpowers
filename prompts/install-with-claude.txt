@@ -1,6 +1,13 @@
 Install the Claude/Codex skills from this repo.
 
-Run ./install.sh, verify yt-dlp, ffmpeg, and WhisperX are available, then test the skill help commands.
+Run ./install.sh to install yt-dlp-superpowers, watch-video, and perfect-cuts.
+
+Verify yt-dlp and ffmpeg are available.
+
+Check whether WhisperX is already available through PATH, WHISPERX_BIN, or the common local install paths printed by the installer.
+
+Do not install WhisperX unless I explicitly ask you to.
+
+Test the skill help commands.
 
 Do not download any videos unless I provide a URL.
-

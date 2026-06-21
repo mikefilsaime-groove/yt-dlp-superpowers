@@ -1,0 +1,4 @@
+interface:
+  display_name: "yt-dlp Superpowers"
+  short_description: "Download, transcribe, and route media workflows."
+  default_prompt: "Use $yt-dlp-superpowers to inspect or download this media URL, saving the result to an appropriate output folder."

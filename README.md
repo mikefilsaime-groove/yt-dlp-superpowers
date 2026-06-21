@@ -4,16 +4,17 @@ Claude/Codex skills built downstream of the excellent [yt-dlp](https://github.co
 
 `yt-dlp` handles the media extraction layer. This repo adds AI-agent workflows around it:
 
-- transcript/caption extraction with local WhisperX/Whisper fallback
-- video frame extraction with `ffmpeg`
+- caption-first transcript extraction with local WhisperX/Whisper fallback
+- exact Markdown transcript artifacts for downstream research
 - timestamped "watch video" context that pairs screenshots with nearby transcript text
+- perfect-cut handoff for talking-head clips using local WhisperX plus waveform analysis
 - installable Claude/Codex skills for repeatable workflows
 
 This is not an official yt-dlp project and does not replace yt-dlp.
 
 ## What You Get
 
-### `yt-dlp` Skill
+### `yt-dlp-superpowers` Skill
 
 Adds a predictable helper for:
 
@@ -21,10 +22,9 @@ Adds a predictable helper for:
 - downloading video/audio
 - downloading subtitles
 - creating transcripts by trying captions first, then falling back to local WhisperX/Whisper
+- handing downloaded media to `watch-video` or `perfect-cuts`
 
 ### `watch-video` Skill
-
-Use only when you explicitly say **Watch Video**.
 
 It creates a multimodal evidence bundle:
 
@@ -46,6 +46,17 @@ Frame sampling presets:
 10s
 ```
 
+### `perfect-cuts` Skill
+
+Turns a raw talking-head recording into an edited package:
+
+- Premiere/Resolve XML
+- MP4 render when requested
+- EDL, SRT, cut log, and Remotion launcher files
+- retake and false-start detection from transcript plus waveform timing
+
+No API keys are required for the default bundle. `perfect-cuts` uses local `ffmpeg`/`ffprobe` and local WhisperX. It does not use FAL or the Gen Media connector.
+
 ## Install
 
 Clone this repo:
@@ -64,9 +75,13 @@ Run the installer:
 The installer:
 
 - checks for `ffmpeg`
-- installs/upgrades `yt-dlp`
+- installs/upgrades `yt-dlp` using the minimum upstream version floor in `requirements.txt`
 - installs Python packages from `requirements.txt`
-- copies the skills into `~/.claude/skills/`
+- copies `yt-dlp-superpowers`, `watch-video`, and `perfect-cuts` into `~/.claude/skills/`
+- removes the old installed `~/.claude/skills/yt-dlp` folder if present, so the renamed skill is the one agents see
+- checks for local WhisperX in common install locations and prints a note if it is missing
+
+On Homebrew-managed Python installs, `install.sh` retries user-site `pip` installs with pip's PEP 668 override when required.
 
 If `ffmpeg` is missing on macOS:
 
@@ -74,14 +89,24 @@ If `ffmpeg` is missing on macOS:
 brew install ffmpeg
 ```
 
+WhisperX is intentionally not installed by default because it can pull a large local ML stack. If you already have it in a custom place, set:
+
+```bash
+export WHISPERX_BIN="/absolute/path/to/whisperx"
+```
+
+If an older `yt-dlp` executable is already on `PATH`, the bundled scripts prefer the freshly installed Python package via `python3 -m yt_dlp`. Set `YTDLP_BIN` only when you need to force a specific executable.
+
 ## Manual Skill Install
 
 If you do not want to run the installer, copy the skill folders manually:
 
 ```bash
 mkdir -p "$HOME/.claude/skills"
-cp -R skills/yt-dlp "$HOME/.claude/skills/"
+rm -rf "$HOME/.claude/skills/yt-dlp"
+cp -R skills/yt-dlp-superpowers "$HOME/.claude/skills/"
 cp -R skills/watch-video "$HOME/.claude/skills/"
+cp -R skills/perfect-cuts "$HOME/.claude/skills/"
 ```
 
 Then install dependencies:
@@ -95,7 +120,13 @@ python3 -m pip install --user -r requirements.txt
 Transcript with caption-first fallback:
 
 ```bash
-$HOME/.claude/skills/yt-dlp/scripts/ytdlp_job.sh transcript "VIDEO_URL" "outputs/transcript"
+$HOME/.claude/skills/yt-dlp-superpowers/scripts/ytdlp_job.sh transcript "VIDEO_URL" "outputs/transcript"
+```
+
+Convert already-downloaded captions or Whisper output into an exact Markdown transcript:
+
+```bash
+$HOME/.claude/skills/yt-dlp-superpowers/scripts/ytdlp_job.sh transcript-md "VIDEO_URL" "outputs/transcript"
 ```
 
 Watch Video bundle:
@@ -110,12 +141,18 @@ Use a lower frame density for long videos:
 python3 "$HOME/.claude/skills/watch-video/scripts/watch_video.py" "VIDEO_URL" --output-dir "outputs/watch-video" --rate 10s
 ```
 
+Perfect Cuts handoff:
+
+```text
+Use $yt-dlp-superpowers to download this video, then use $perfect-cuts on the downloaded file.
+```
+
 ## Prompt To Give Claude/Codex
 
 After cloning this repo, you can ask Claude/Codex:
 
 ```text
-Install the Claude/Codex skills from this repo. Run ./install.sh, verify yt-dlp, ffmpeg, and WhisperX are available, then test the skill help commands. Do not download any videos unless I provide a URL.
+Install the Claude/Codex skills from this repo. Run ./install.sh, verify yt-dlp and ffmpeg, check whether WhisperX is already available, and test the skill help commands. Do not download any videos unless I provide a URL. Do not install WhisperX unless I explicitly ask you to.
 ```
 
 To use the visual workflow:
@@ -124,9 +161,14 @@ To use the visual workflow:
 Watch Video: use the watch-video skill on this URL at 1 frame per second and summarize what is visible on screen compared with what is said in the transcript.
 ```
 
+To clean up talking-head footage:
+
+```text
+Use $perfect-cuts on this local clip. Include an MP4 render and put the package in Downloads.
+```
+
 ## Attribution
 
 This project is built downstream of [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 All media extraction credit belongs to the yt-dlp project and its contributors. This repo adds Claude/Codex skills and workflow scripts around yt-dlp, ffmpeg, WhisperX, and Whisper.
-

@@ -1,5 +1,2 @@
-yt-dlp
-whisperx
-openai-whisper
+yt-dlp>=2026.6.9
 python-dotenv
-

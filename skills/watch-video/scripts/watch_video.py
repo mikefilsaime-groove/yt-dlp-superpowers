@@ -57,6 +57,37 @@ def require(cmd: str) -> str:
     return path
 
 
+def command_ok(cmd: list[str]) -> bool:
+    try:
+        return run([*cmd, "--version"], check=False).returncode == 0
+    except FileNotFoundError:
+        return False
+
+
+def find_ytdlp() -> list[str]:
+    override = os.environ.get("YTDLP_BIN")
+    if override:
+        if Path(override).exists() or shutil.which(override):
+            return [override]
+        print(f"YTDLP_BIN is set but was not found: {override}", file=sys.stderr)
+        sys.exit(127)
+
+    candidates = [
+        [sys.executable, "-m", "yt_dlp"],
+        ["python3", "-m", "yt_dlp"],
+    ]
+    path = shutil.which("yt-dlp")
+    if path:
+        candidates.append([path])
+
+    for cmd in candidates:
+        if command_ok(cmd):
+            return cmd
+
+    print("Missing required yt-dlp. Install the Python package or set YTDLP_BIN.", file=sys.stderr)
+    sys.exit(127)
+
+
 def slugify(value: str) -> str:
     value = re.sub(r"[^\w\s.-]", "", value, flags=re.UNICODE).strip()
     value = re.sub(r"\s+", "-", value)
@@ -193,10 +224,10 @@ def download_source(source: str, work_dir: Path) -> Path:
             shutil.copy2(original, target)
         return target
 
-    require("yt-dlp")
+    ytdlp = find_ytdlp()
     template = "%(title).200B [%(id)s].%(ext)s"
     run([
-        "yt-dlp",
+        *ytdlp,
         "--no-playlist",
         "--write-info-json",
         "--write-thumbnail",
@@ -215,10 +246,10 @@ def download_source(source: str, work_dir: Path) -> Path:
 def try_download_subtitles(source: str, work_dir: Path) -> Path | None:
     if Path(source).exists():
         return None
-    require("yt-dlp")
+    ytdlp = find_ytdlp()
     before = {p.name for p in work_dir.iterdir() if p.is_file()}
     run([
-        "yt-dlp",
+        *ytdlp,
         "--no-playlist",
         "--skip-download",
         "--write-subs",
@@ -240,6 +271,9 @@ def find_whisperx() -> str | None:
         os.environ.get("WHISPERX_BIN"),
         shutil.which("whisperx"),
         str(Path.home() / ".local/bin/whisperx"),
+        str(Path.home() / ".buttercut/venv/bin/whisperx"),
+        str(Path.home() / ".perfect-cuts/venv/bin/whisperx"),
+        str(Path.home() / "GitHub/Marketing Assets and Skills/.venv-whisperx/bin/whisperx"),
         str(Path.home() / "Library/Python/3.9/bin/whisperx"),
     ]
     return next((x for x in candidates if x and Path(x).exists()), None)

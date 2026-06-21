@@ -73,6 +73,9 @@ It checks `PATH` first, then common local install paths:
 ```text
 $HOME/.local/bin/whisperx
 $HOME/.local/bin/whisper
+$HOME/.buttercut/venv/bin/whisperx
+$HOME/.perfect-cuts/venv/bin/whisperx
+$HOME/GitHub/Marketing Assets and Skills/.venv-whisperx/bin/whisperx
 $HOME/Library/Python/3.9/bin/whisperx
 $HOME/Library/Python/3.9/bin/whisper
 ```
@@ -80,9 +83,18 @@ $HOME/Library/Python/3.9/bin/whisper
 Optional overrides:
 
 ```bash
+YTDLP_BIN=/path/to/yt-dlp
 WHISPERX_BIN=/path/to/whisperx
 WHISPER_BIN=/path/to/whisper
 WHISPER_MODEL=base
 WHISPER_DEVICE=cpu
 WHISPER_COMPUTE_TYPE=int8
+```
+
+The script detects `yt-dlp` in this order:
+
+```text
+$YTDLP_BIN
+python3 -m yt_dlp
+yt-dlp on PATH
 ```
