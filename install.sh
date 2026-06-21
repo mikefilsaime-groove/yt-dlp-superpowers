@@ -43,6 +43,20 @@ find_whisperx() {
   command -v whisperx 2>/dev/null
 }
 
+find_genmedia() {
+  if [[ -n "${GENMEDIA_BIN:-}" && -x "$GENMEDIA_BIN" ]]; then
+    printf '%s\n' "$GENMEDIA_BIN"
+    return 0
+  fi
+
+  if [[ -x "$HOME/.local/bin/genmedia" ]]; then
+    printf '%s\n' "$HOME/.local/bin/genmedia"
+    return 0
+  fi
+
+  command -v genmedia 2>/dev/null
+}
+
 pip_install_user() {
   local log_file
   log_file="$(mktemp)"
@@ -71,20 +85,34 @@ pip_install_user --upgrade yt-dlp
 pip_install_user -r "$repo_dir/requirements.txt"
 
 mkdir -p "$skills_dir"
-rm -rf "$skills_dir/yt-dlp" "$skills_dir/yt-dlp-superpowers" "$skills_dir/watch-video" "$skills_dir/perfect-cuts"
+re_light_config_backup=""
+if [[ -f "$skills_dir/re-light/config.json" ]]; then
+  re_light_config_backup="$(mktemp)"
+  cp "$skills_dir/re-light/config.json" "$re_light_config_backup"
+fi
+
+rm -rf "$skills_dir/yt-dlp" "$skills_dir/yt-dlp-superpowers" "$skills_dir/watch-video" "$skills_dir/perfect-cuts" "$skills_dir/re-light"
 cp -R "$repo_dir/skills/yt-dlp-superpowers" "$skills_dir/yt-dlp-superpowers"
 cp -R "$repo_dir/skills/watch-video" "$skills_dir/watch-video"
 cp -R "$repo_dir/skills/perfect-cuts" "$skills_dir/perfect-cuts"
+cp -R "$repo_dir/skills/re-light" "$skills_dir/re-light"
+
+if [[ -n "$re_light_config_backup" ]]; then
+  cp "$re_light_config_backup" "$skills_dir/re-light/config.json"
+  rm -f "$re_light_config_backup"
+fi
 
 chmod +x "$skills_dir/yt-dlp-superpowers/scripts/ytdlp_job.sh"
 chmod +x "$skills_dir/watch-video/scripts/watch_video.py"
 chmod +x "$skills_dir/perfect-cuts/scripts/open-in-remotion-mac.command" 2>/dev/null || true
+chmod +x "$skills_dir/re-light/scripts/relight.py" 2>/dev/null || true
 
 echo
 echo "Installed skills:"
 echo "  $skills_dir/yt-dlp-superpowers"
 echo "  $skills_dir/watch-video"
 echo "  $skills_dir/perfect-cuts"
+echo "  $skills_dir/re-light"
 echo
 echo "Verifying commands..."
 python_ytdlp_version="$(python3 -m yt_dlp --version)"
@@ -115,6 +143,21 @@ if command -v node >/dev/null 2>&1; then
   echo "  node found: $(command -v node)"
 else
   echo "  node not found. Only the optional Perfect Cuts Remotion launcher needs Node.js."
+fi
+
+genmedia_path="$(find_genmedia || true)"
+if [[ -n "$genmedia_path" ]]; then
+  echo "  genmedia found: $genmedia_path"
+else
+  echo "  genmedia not found. Re-light can still use FAL_KEY directly, but GenMedia setup is the preferred credential path."
+fi
+
+if [[ -n "${FAL_KEY:-}" ]]; then
+  echo "  FAL_KEY found in environment for re-light"
+elif [[ -f "$HOME/.genmedia/config.json" ]]; then
+  echo "  GenMedia config found for re-light credentials: $HOME/.genmedia/config.json"
+else
+  echo "  re-light needs FAL_KEY or a configured GenMedia CLI before generation."
 fi
 
 echo "Done."

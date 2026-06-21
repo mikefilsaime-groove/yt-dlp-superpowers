@@ -29,3 +29,9 @@ Download a video and hand it to Perfect Cuts:
 ```text
 Use $yt-dlp-superpowers to download VIDEO_URL into outputs/source, then use $perfect-cuts on the downloaded local file.
 ```
+
+Download a short clip and hand it to Re-light:
+
+```text
+Use $yt-dlp-superpowers to download VIDEO_URL into outputs/source, then use $re-light on the downloaded 3-10 second local clip with a cinematic studio prompt.
+```

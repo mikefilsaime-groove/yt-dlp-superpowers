@@ -1,6 +1,7 @@
 ---
 name: yt-dlp-superpowers
-description: Use this skill when the user wants yt-dlp Superpowers: download, inspect, archive, transcribe, or extract media from YouTube or other yt-dlp-supported sites using local yt-dlp. Includes workflows for video, audio, subtitles, metadata, playlists, exact Markdown transcripts, and handoffs to watch-video or perfect-cuts.
+description: >-
+  Use this skill when the user wants yt-dlp Superpowers: download, inspect, archive, transcribe, or extract media from YouTube or other yt-dlp-supported sites using local yt-dlp. Includes workflows for video, audio, subtitles, metadata, playlists, exact Markdown transcripts, and handoffs to watch-video, perfect-cuts, or re-light.
 metadata:
   short-description: Download, inspect, transcribe, and hand off media
 ---
@@ -142,6 +143,15 @@ If the user asks to download a video and then clean cut, perfect cut, remove ret
 1. Use this skill to download the source video locally.
 2. Hand the downloaded local video path to the `perfect-cuts` skill.
 3. Do not use yt-dlp captions as the cut timing source; `perfect-cuts` should use WhisperX plus waveform analysis.
+
+## Handoff To re-light
+
+If the user asks to download a short clip and then relight, re-scene, change lighting, make it cinematic, or place the subject in a new environment:
+
+1. Use this skill to download the source video locally.
+2. If the clip is longer than 10 seconds, ask the user to choose or trim a 3-10 second segment before invoking `re-light`.
+3. Hand the downloaded local video path and the requested look/scene prompt to the `re-light` skill.
+4. Respect `re-light`'s still-image approval gate before any paid video generation step.
 
 ## Upstream Reference
 

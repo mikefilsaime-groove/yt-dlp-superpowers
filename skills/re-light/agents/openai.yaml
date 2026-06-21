@@ -1,0 +1,4 @@
+interface:
+  display_name: "Re-light"
+  short_description: "Relight short clips with Fal.ai."
+  default_prompt: "Use $re-light to relight this short clip with a cinematic scene prompt."

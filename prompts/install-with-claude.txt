@@ -1,10 +1,12 @@
 Install the Claude/Codex skills from this repo.
 
-Run ./install.sh to install yt-dlp-superpowers, watch-video, and perfect-cuts.
+Run ./install.sh to install yt-dlp-superpowers, watch-video, perfect-cuts, and re-light.
 
 Verify yt-dlp and ffmpeg are available.
 
 Check whether WhisperX is already available through PATH, WHISPERX_BIN, or the common local install paths printed by the installer.
+
+Check whether GenMedia or FAL_KEY is configured for re-light. Do not print secrets.
 
 Do not install WhisperX unless I explicitly ask you to.
 
